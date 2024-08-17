@@ -62,7 +62,10 @@ col2.addWidget(picture_box)
 
 
 
+master_layout.addLayout(col1, 20)
+master_layout.addLayout(col2, 80)
 
+main_window.setLayout(master_layout)
 
 # A show/exec
 main_window.show()
