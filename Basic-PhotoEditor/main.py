@@ -1,6 +1,9 @@
 # Imports Modules
+import os
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QListWidget, QComboBox, QGridLayout
+from PyQt5.QtWidgets import QApplication, QFileDialog, QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QListWidget, QComboBox, QGridLayout
+from PyQt5.QtGui import QPixmap
+from PIL import Image, ImageFilter, ImageEnhance
 
 # App Settings
 app = QApplication([])
@@ -66,6 +69,77 @@ master_layout.addLayout(col1, 20)
 master_layout.addLayout(col2, 80)
 
 main_window.setLayout(master_layout)
+
+# All App Functionality
+
+working_directory = ""
+
+# Filter files and extentiosn 
+def filter(files, extensions):
+    results = []
+    for file in files:
+        for ext in extensions:
+            if file.endswith(ext):
+                results.append(file)
+    return results
+
+
+# Chose current work directory
+
+def getWorkDirectory():
+    global working_directory
+    working_directory = QFileDialog.getExistingDirectory()
+    extensions = ['.jpg', '.png', '.jpeg', '.svg']
+    filenames = filter(os.listdir(working_directory), extensions)
+    file_lsit.clear()
+    for filename in filenames:
+        file_lsit.addItem(filename)
+
+
+
+class Editor():
+    def __init__(self):
+        self.image = None
+        self.original = None
+        self.filename = None
+        self.save_folder = "edits/"        
+        
+    def load_image(self, filename):
+        self.filename = filename
+        fullname = os.path.join(working_directory, self.filename)
+        self.image = Image.open(fullname)
+        self.original = self.image.copy()
+    
+    def save_image(self):
+        path = os.path.join(working_directory, self.save_folder)
+        if not(os.path.exists(path) or os.path.isdir(path)):
+            os.mkdir(path)
+        
+        fullname = os.path.join(path, self.filename)
+        self.image.save(fullname)
+        
+    def show_image(self, path):
+        picture_box.hide()
+        image = QPixmap(path)
+        w, h = picture_box.width(), picture_box.height()
+        image = image.scaled(w, h, Qt.KeepAspectRatio)
+        picture_box.setPixmap(image)
+        picture_box.show()
+         
+        
+def displayImage():
+    if file_lsit.currentRow() >= 0:
+        filename = file_lsit.currentItem().text()
+        main.load_image(filename)
+        main.show_image(os.path.join(working_directory, main.filename))
+    
+
+main = Editor()
+
+
+# Connections
+btn_folder.clicked.connect(getWorkDirectory)
+file_lsit.currentRowChanged.connect(displayImage)
 
 # A show/exec
 main_window.show()

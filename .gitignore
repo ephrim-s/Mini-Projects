@@ -11,5 +11,6 @@ pyvenv.cfg
 .venv
 pip-selfcheck.json
 
+img1.jpg
 venv/
 miPrjenv/
