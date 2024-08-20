@@ -97,6 +97,7 @@ def getWorkDirectory():
         file_list.addItem(filename)
 
 
+
 class Editor():
     def __init__(self):
         self.image = None
@@ -126,28 +127,53 @@ class Editor():
         picture_box.setPixmap(image)
         picture_box.show()
     
-    def transformImage(self, transformation):
-        transformations = {
-            "B/W": lambda image: image.convert("L"),
-            "Color": lambda image: ImageEnhance.Color(image).enhance(1.2),
-            "Left": lambda image: image.transpose(Image.ROTATE_90),
-            "Right": lambda image: image.transpose(Image.ROTATE_270),
-            "Contrast": lambda image: ImageEnhance.Contrast(image).enhance(1.2),
-            "Sharpen": lambda image: image.filter(ImageFilter.SHARPEN),
-            "Blur": lambda image: image.filter(ImageFilter.BLUR),
-            "Mirror": lambda image: image.transpose(Image.FLIP_LEFT_RIGHT)
-                            
-        }
-        transformation_function = transformations.get(transformation)
-        if transformation_function:
-            self.image = transformation_function(self.image)
-            self.save_image()
-            
+    def gray(self):
+        self.image = self.image.convert("L")
+        self.save_image()
+        image_path = os.path.join(working_directory, self.save_folder, self.filename)
+        self.show_image(image_path)
+    
+    def left(self):
+        self.image = self.image.transpose(Image.ROTATE_90)
+        self.save_image()
+        image_path = os.path.join(working_directory, self.save_folder, self.filename)
+        self.show_image(image_path)
+    
+    def right(self):
+        self.image = self.image.transpose(Image.ROTATE_270)
+        self.save_image()
+        image_path = os.path.join(working_directory, self.save_folder, self.filename)
+        self.show_image(image_path)
+    
+    def mirror(self):
+        self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
+        self.save_image()
+        image_path = os.path.join(working_directory, self.save_folder, self.filename)
+        self.show_image(image_path)
+    
+    def sharpen(self):
+        self.image = self.image.filter(ImageFilter.SHARPEN)
+        self.save_image()
+        image_path = os.path.join(working_directory, self.save_folder, self.filename)
+        self.show_image(image_path)
+    
+    def color(self):
+        self.image = ImageEnhance.Color(self.image).enhance(1.2)
         self.save_image()
         image_path = os.path.join(working_directory, self.save_folder, self.filename)
         self.show_image(image_path)
         
-        
+    def contrast(self):
+        self.image = ImageEnhance.Contrast(self.image).enhance(1.2)
+        self.save_image()
+        image_path = os.path.join(working_directory, self.save_folder, self.filename)
+        self.show_image(image_path)
+                
+    def blur(self):
+        self.image = self.image.filter(ImageFilter.BLUR)
+        self.save_image()
+        image_path = os.path.join(working_directory, self.save_folder, self.filename)
+        self.show_image(image_path)
         
     def apply_filter(self, filter_name):
         if filter_name == "Original":
@@ -188,21 +214,23 @@ def displayImage():
         main.show_image(os.path.join(working_directory, main.filename))
 
 
+
 main = Editor()
+
 
 # Connections
 btn_folder.clicked.connect(getWorkDirectory)
 file_list.currentRowChanged.connect(displayImage)
 filter_box.currentTextChanged.connect(handle_filter)
 
-gray.clicked.connect(lambda: main.transformImage("B/W"))
-btn_left.clicked.connect(lambda: main.transformImage("Left"))
-btn_right.clicked.connect(lambda: main.transformImage("Right"))
-mirror.clicked.connect(lambda: main.transformImage("Mirror"))
-sharpness.clicked.connect(lambda: main.transformImage("Sharpen"))
-color.clicked.connect(lambda: main.transformImage("Color"))
-contrast.clicked.connect(lambda: main.transformImage("Contrast"))
-blur.clicked.connect(lambda: main.transformImage("Blur"))
+gray.clicked.connect(main.gray)
+btn_left.clicked.connect(main.left)
+btn_right.clicked.connect(main.right)
+mirror.clicked.connect(main.mirror)
+sharpness.clicked.connect(main.sharpen)
+color.clicked.connect(main.color)
+contrast.clicked.connect(main.contrast)
+blur.clicked.connect(main.blur)
 
 
 # A show/exec
